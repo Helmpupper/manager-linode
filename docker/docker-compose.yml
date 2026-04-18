@@ -1,0 +1,30 @@
+services:
+  manager-linode:
+    image: ghcr.io/helmpupper/manager-linode:${IMAGE_TAG:-latest}
+    container_name: manager-linode
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        REACT_APP_CLIENT_ID: ${REACT_APP_CLIENT_ID:-__RUNTIME__}
+        REACT_APP_API_ROOT: ${REACT_APP_API_ROOT:-https://api.linode.com/v4}
+        REACT_APP_LOGIN_ROOT: ${REACT_APP_LOGIN_ROOT:-https://login.linode.com}
+        REACT_APP_LAUNCH_DARKLY_ID: ${REACT_APP_LAUNCH_DARKLY_ID:-}
+        REACT_APP_DISABLE_NEW_RELIC: ${REACT_APP_DISABLE_NEW_RELIC:-true}
+        REACT_APP_APP_ROOT: ${REACT_APP_APP_ROOT:-http://localhost:3000}
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3000}:80"
+    environment:
+      REACT_APP_CLIENT_ID: ${REACT_APP_CLIENT_ID:-}
+      REACT_APP_API_ROOT: ${REACT_APP_API_ROOT:-https://api.linode.com/v4}
+      REACT_APP_LOGIN_ROOT: ${REACT_APP_LOGIN_ROOT:-https://login.linode.com}
+      REACT_APP_APP_ROOT: ${REACT_APP_APP_ROOT:-http://localhost:3000}
+      REACT_APP_LAUNCH_DARKLY_ID: ${REACT_APP_LAUNCH_DARKLY_ID:-}
+      REACT_APP_DISABLE_NEW_RELIC: ${REACT_APP_DISABLE_NEW_RELIC:-true}
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
